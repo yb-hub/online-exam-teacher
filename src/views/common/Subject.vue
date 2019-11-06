@@ -13,38 +13,17 @@
     <el-table
       v-loading="listLoading"
       :key="tableKey"
-      :data="list"
+      :data="subjectList"
       :default-sort = "{prop: 'id', order: 'ascending'}"
       border
       fit
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="序号" prop="id" sortable align="center" width="120">
-        <!--<template slot-scope="scope">-->
-          <!--<span>{{ scope.row.id }}</span>-->
-        <!--</template>-->
-      </el-table-column>
-      <el-table-column label="公告内容" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.noticeContent }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="发布人姓名" align="center" width="140">
-        <template slot-scope="scope">
-          <span>{{ scope.row.teaName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="tno" sortable label="发布教工号" align="center" width="140">
-        <template slot-scope="scope">
-          <span>{{ scope.row.tno }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="noticeCreateTime" sortable label="发布公告时间" align="center" width="220">
-        <template slot-scope="scope">
-          <span>{{ scope.row.noticeCreateTime | date-format }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="序号" prop="id" sortable align="center" width="120"/>
+      <el-table-column label="科目名称" prop="name" align="center" />
+      <el-table-column label="创建时间" prop="createTime" align="center" />
+      <el-table-column label="更新时间" prop="updateTime" align="center" />
       <el-table-column label="操作" align="center" class-name="small-padding" width="220">
         <template slot-scope="{row}">
           <el-button v-waves type="primary" icon="el-icon-edit" size="mini" @click="handleUpdate(row)">
@@ -57,7 +36,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="page" :limit.sync="pageSize" @pagination="getSubjectList(page,pageSize)" />
 
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogStatus">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
@@ -84,8 +63,8 @@
 </template>
 
 <script>
-  /* eslint-disable */
-  import { reqGetNoticesList, reqSearchNoticesList, reqInsertNoticeInfo, reqUpdateNoticeInfo, reqDeleteNotice } from '@/api/notice'
+/* eslint-disable */
+  import { getSubjects, reqSearchNoticesList, reqInsertNoticeInfo, reqUpdateNoticeInfo, reqDeleteNotice } from '@/api/notice'
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -97,16 +76,21 @@
     directives: { waves },
     data() {
       return {
+        subjectList:[
+          {
+            id:"",
+            name:"",
+            createTime:"",
+            updateTime:""
+          }
+        ],
         keyWord: "",
-        list: null,
-        total: 0,
+        page:1,
+        pageSize:1,
+        total:"",
+        pages:"",
         listLoading: true,
-        listQuery: {
-          page: 1,
-          limit: 10,
-          noticeContent: undefined,
-          teaName: undefined
-        },
+
         temp: {
           noticeContent: '',
           teaName: this.$store.state.teacher.userInfo.teaName,
@@ -130,16 +114,17 @@
       }
     },
     created() {
-      this.getList()
+      this.getSubjectList(this.page,this.pageSize)
     },
     methods: {
-      async getList() {
-        this.listLoading = true
-        let result = await reqGetNoticesList()
-        if (result.statu === 0){
-          this.total = result.data.length
-          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-        }
+      async getSubjectList(page,pageSize) {
+        console.log("page:"+page);
+        console.log("pageSize:"+pageSize);
+        let result = await getSubjects(page,pageSize)
+        this.subjectList = result.data.data
+        console.log(result.data);
+        this.pages = result.data.pages
+        this.total = result.data.total
         this.listLoading = false
       },
       handleUpdate(row) {
