@@ -28,7 +28,17 @@ export default function ajax(url = '', data = {}, type = 'GET') {
       promise = axios.get(url)
     } else {
       // 发送 post 请求
-      promise = axios.post(url, data)
+      switch (type) {
+        case 'PUT':
+          promise = axios.put(url, data)
+          break
+        case 'POST':
+          promise = axios.post(url, data)
+          break
+        case 'DELETE':
+          promise = axios.delete(url, data)
+          break
+      }
     }
     promise.then(response => {
       // 成功回调resolve()

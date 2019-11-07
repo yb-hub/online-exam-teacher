@@ -29,7 +29,7 @@
           <el-button v-waves type="primary" icon="el-icon-edit" size="mini" @click="handleUpdate(row)">
             编辑科目
           </el-button>
-          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="confirmDeleteNotice(row)">
+          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -39,17 +39,17 @@
     <pagination v-show="total>0" :total="total" :page.sync="page" :limit.sync="pageSize" @pagination="getSubjectList(page,pageSize)" />
 
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogStatus">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="公告内容" prop="noticeContent">
-          <el-input v-model="temp.noticeContent" :rows="4" type="textarea" />
+      <el-form ref="dataForm" :model="subject" :rules="rules" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="科目名称" prop="subjectName">
+          <el-input v-model="subject.name" :rows="1" type="textarea" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='添加'?createData():updateData()">
-          {{ dialogStatus==='添加'?'确认发布':'确认编辑' }}
+        <el-button type="primary" @click="dialogStatus==='添加'?insert():update()">
+          {{ dialogStatus==='添加'?'确认添加':'确认编辑' }}
         </el-button>
       </div>
     </el-dialog>
@@ -64,7 +64,7 @@
 
 <script>
 /* eslint-disable */
-  import { getSubjects, reqSearchNoticesList, reqInsertNoticeInfo, reqUpdateNoticeInfo, reqDeleteNotice } from '@/api/notice'
+  import { getSubjects, insertSubject,updateSubject} from '@/api/subject'
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -86,21 +86,21 @@
         ],
         keyWord: "",
         page:1,
-        pageSize:1,
+        pageSize:10,
         total:"",
         pages:"",
         listLoading: true,
 
-        temp: {
-          noticeContent: '',
-          teaName: this.$store.state.teacher.userInfo.teaName,
-          tno: this.$store.state.teacher.userInfo.tno
+        subject:{
+          id:"",
+          name:""
+        },
+        rules: {
+          name: [{ required: true, message: '科目名称不能为空', trigger: 'blur' }],
         },
         dialogFormVisible: false,
         dialogStatus: '',
-        rules: {
-          noticeContent: [{ required: true, message: '公告内容为必填项', trigger: 'blur' }],
-        },
+
         downloadLoading: false,
         myBackToTopStyle: {
           right: '50px',
@@ -127,37 +127,75 @@
         this.total = result.data.total
         this.listLoading = false
       },
-      handleUpdate(row) {
-        this.temp = Object.assign({}, row) // 复制对象
+      handleCreate(){
+        this.dialogStatus = '添加'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+      insert(){
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.insertSubject()
+          }
+        })
+      },
+      async insertSubject(){
+        let result = await insertSubject(this.subject)
+        if (result.code === 200){
+          this.dialogFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: '添加成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getSubjectList(this.page,this.pageSize)
+        } else {
+          this.$notify({
+            title: '失败',
+            message: result.message,
+            type: 'error',
+            duration: 2000
+          })
+        }
+      },
+
+      handleUpdate(row){
+        console.log(row);
+        this.subject.id = row.id
+        this.subject.name = row.name
         this.dialogStatus = '编辑'
         this.dialogFormVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
       },
-      updateData() {
+      update(){
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.handleUpdateNotice()
+            this.updateSubject()
           }
         })
       },
-      async handleUpdateNotice() {
-        let result = await reqUpdateNoticeInfo(this.temp)
-        if (result.statu === 0){
+      async updateSubject(){
+        let result = await updateSubject(this.subject)
+        if (result.code === 200){
           this.dialogFormVisible = false
           this.$message({
-            message: result.msg,
+            message: result.message,
             type: 'success'
           })
-          this.getList()
+          this.getSubjectList(this.page,this.pageSize)
         } else {
           this.$message({
-            message: result.msg,
+            message: result.message,
             type: 'error'
           })
         }
       },
+
       async handleFilter(){
         this.listQuery.page = 1
         this.listLoading = true
@@ -168,59 +206,19 @@
         }
         this.listLoading = false
       },
-      resetTemp(){
-        this.temp = {
-          noticeContent: '',
-          teaName: this.$store.state.teacher.userInfo.teaName,
-          tno: this.$store.state.teacher.userInfo.tno
-        }
-      },
-      handleCreate(){
-        this.resetTemp()
-        this.dialogStatus = '添加'
-        this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
-      },
-      createData(){
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.insertNoticeInfo()
-          }
-        })
-      },
-      async insertNoticeInfo(){
-        let result = await reqInsertNoticeInfo(this.temp)
-        if (result.statu === 0){
-          this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '添加成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.getList()
-        } else {
-          this.$notify({
-            title: '失败',
-            message: result.msg,
-            type: 'error',
-            duration: 2000
-          })
-        }
-      },
-      confirmDeleteNotice(row) {
-        this.$confirm('确定删除该公告吗?', '提示', {
+
+
+      confirmDeleteSubject(row) {
+        this.$confirm('确定删除该科目吗?', '提示', {
           confirmButtonText: '确定删除',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.handleDeleteNotice(row)
+          this.handleDeleteSubject(row)
         }).catch(() => {
         })
       },
-      async handleDeleteNotice(row) {
+      async handleDeleteSubject(row) {
         let noticeId = row.noticeId
         let result = await reqDeleteNotice(noticeId)
         if (result.statu === 0){
@@ -228,7 +226,7 @@
             message: result.msg,
             type: 'success'
           })
-          this.getList()
+          this.getSubjectList(this.page,this.pageSize)
         } else {
           this.$message({
             message: result.msg,
