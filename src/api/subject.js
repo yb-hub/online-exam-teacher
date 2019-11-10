@@ -3,6 +3,8 @@ const BASE_URL = 'http://localhost:8008'
 
 export const getSubjects = (name, page, pageSize) => ajax(BASE_URL + '/subjects', { name, page, pageSize })
 
+export const getSubjectsSimple = () => ajax(BASE_URL + '/subjects/simple', {}, 'GET')
+
 export const insertSubject = (subject) => ajax(BASE_URL + '/subjects', subject, 'POST')
 
 export const updateSubject = (subject) => ajax(BASE_URL + '/subjects/' + subject.id, subject, 'PUT')

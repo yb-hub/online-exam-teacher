@@ -23,7 +23,6 @@ export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
 
-
   {
     path: '/',
     component: Layout,
@@ -224,22 +223,22 @@ export const constantRouterMap = [
   // },
 
   {
-    path:'/common',
-    component:Layout,
-    meta:{title:'科目/专业/班级管理',icon:'info'},
-    children:[
+    path: '/common',
+    component: Layout,
+    meta: { title: '科目/专业/班级管理', icon: 'info' },
+    children: [
       {
-        path:'subject',
-        name:'subject',
-        meta:{title:'科目管理',icon:'info'},
-        component: ()=> import('@/views/common/Subject'),
+        path: 'subject',
+        name: 'subject',
+        meta: { title: '科目管理', icon: 'info' },
+        component: () => import('@/views/common/Subject')
       },
       {
-        path:'major',
-        name:'major',
-        meta:{title:'专业管理',icon:'info'},
-        component: ()=>import('@/views/common/Major')
-      },
+        path: 'major',
+        name: 'major',
+        meta: { title: '专业管理', icon: 'info' },
+        component: () => import('@/views/common/Major')
+      }
 
     ]
   },
