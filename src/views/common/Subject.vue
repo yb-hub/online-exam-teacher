@@ -64,7 +64,7 @@
 
 <script>
 /* eslint-disable */
-  import { getSubjects, insertSubject,updateSubject} from '@/api/subject'
+  import { getSubjects, insertSubject,updateSubject,deleteSubject} from '@/api/subject'
   import waves from '@/directive/waves' // Waves directive
   import { parseTime } from '@/utils'
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -114,19 +114,27 @@
       }
     },
     created() {
-      this.getSubjectList(this.page,this.pageSize)
+      this.getSubjectList(this.keyWord,this.page,this.pageSize)
     },
     methods: {
-      async getSubjectList(page,pageSize) {
+      //获取列表
+      async getSubjectList(keyWord,page,pageSize) {
         console.log("page:"+page);
         console.log("pageSize:"+pageSize);
-        let result = await getSubjects(page,pageSize)
+        let result = await getSubjects(keyWord,page,pageSize)
         this.subjectList = result.data.data
         console.log(result.data);
         this.pages = result.data.pages
         this.total = result.data.total
         this.listLoading = false
       },
+      //根据过滤条件获取列表
+      async handleFilter(){
+        this.listLoading = true
+        this.getSubjectList(this.keyWord,this.page,this.pageSize)
+        this.listLoading = false
+      },
+      //新增
       handleCreate(){
         this.dialogStatus = '添加'
         this.dialogFormVisible = true
@@ -151,7 +159,7 @@
             type: 'success',
             duration: 2000
           })
-          this.getSubjectList(this.page,this.pageSize)
+          this.getSubjectList(this.keyWord,this.page,this.pageSize)
         } else {
           this.$notify({
             title: '失败',
@@ -161,7 +169,7 @@
           })
         }
       },
-
+      //修改
       handleUpdate(row){
         console.log(row);
         this.subject.id = row.id
@@ -187,7 +195,7 @@
             message: result.message,
             type: 'success'
           })
-          this.getSubjectList(this.page,this.pageSize)
+          this.getSubjectList(this.keyWord,this.page,this.pageSize)
         } else {
           this.$message({
             message: result.message,
@@ -196,44 +204,33 @@
         }
       },
 
-      async handleFilter(){
-        this.listQuery.page = 1
-        this.listLoading = true
-        let result = await reqSearchNoticesList(this.listQuery.noticeContent, this.listQuery.teaName)
-        if (result.statu === 0){
-          this.total = result.data.length
-          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-        }
-        this.listLoading = false
-      },
-
-
-      confirmDeleteSubject(row) {
+      //删除
+      handleDelete(row){
         this.$confirm('确定删除该科目吗?', '提示', {
           confirmButtonText: '确定删除',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.handleDeleteSubject(row)
+          console.log(row);
+          this.handleDeleteSubject(row.id)
         }).catch(() => {
         })
       },
-      async handleDeleteSubject(row) {
-        let noticeId = row.noticeId
-        let result = await reqDeleteNotice(noticeId)
-        if (result.statu === 0){
+      async handleDeleteSubject(subjectId){
+        let result = await deleteSubject(subjectId)
+        if(result.code === 200){
           this.$message({
-            message: result.msg,
-            type: 'success'
+            message:result.message,
+            type:'success'
           })
-          this.getSubjectList(this.page,this.pageSize)
-        } else {
+          this.getSubjectList(this.keyWord,this.page,this.pageSize)
+        }else{
           this.$message({
             message: result.msg,
             type: 'error'
           })
         }
-      }
+      },
     }
   }
 </script>

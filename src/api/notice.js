@@ -1,6 +1,6 @@
 import ajax from '@/config/ajax'
-// const BASE_URL = process.env.BASE_API
-const BASE_URL = 'http://localhost:8008'
+const BASE_URL = process.env.BASE_API
+// const BASE_URL = 'http://localhost:8008'
 
 export const getSubjects = (page, pageSize) => ajax(BASE_URL + '/subjects', { page, pageSize })
 // 获取全部公告信息
