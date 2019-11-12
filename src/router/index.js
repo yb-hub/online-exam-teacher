@@ -225,7 +225,7 @@ export const constantRouterMap = [
   {
     path: '/common',
     component: Layout,
-    meta: { title: '科目/专业/班级管理', icon: 'info' },
+    meta: { title: '科目/专业/课程管理', icon: 'info' },
     children: [
       {
         path: 'subject',
@@ -238,6 +238,12 @@ export const constantRouterMap = [
         name: 'major',
         meta: { title: '专业管理', icon: 'info' },
         component: () => import('@/views/common/Major')
+      },
+      {
+        path: 'course',
+        name: 'course',
+        meta: { title: '课程管理', icon: 'info' },
+        component: () => import('@/views/common/Course')
       }
 
     ]
