@@ -34,3 +34,12 @@ this.$refs['dataForm'].validate((valid) => {
           }
         })
 ```
+
+## element radio回显无效
+要使用动态绑定赋值为label
+```js
+ <el-form-item label="题目类型" prop="type">
+          <el-radio v-model="tempQuestion.type" :label="1">单选题</el-radio>
+          <el-radio v-model="tempQuestion.type" :label="2">多选题</el-radio>
+          <el-radio v-model="tempQuestion.type" :label="3">判断题</el-radio>
+```

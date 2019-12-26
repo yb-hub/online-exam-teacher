@@ -221,7 +221,25 @@ export const constantRouterMap = [
   //     }
   //   ]
   // },
-
+  {
+    path: '/question',
+    component: Layout,
+    meta: { title: '题库', icon: 'info' },
+    children: [
+      {
+        path: '',
+        name: 'index',
+        component: () => import('@/views/question/Question'),
+        meta: { title: '题库浏览', icon: 'info' }
+      },
+      {
+        path: 'upLoad',
+        name: 'upLoad',
+        component: () => import('@/views/question/Question'),
+        meta: { title: '题库上传', icon: 'info' }
+      }
+    ]
+  },
   {
     path: '/common',
     component: Layout,
