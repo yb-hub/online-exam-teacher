@@ -6,3 +6,5 @@ export const getQuestions = (queryList) => ajax(BASE_URL + '/questions', { 'keyW
 export const insertQuestions = (question) => ajax(BASE_URL + '/questions', question, 'POST')
 
 export const updateQuestions = (id, question) => ajax(BASE_URL + '/questions/' + id, question, 'PUT')
+
+export const deleteQuestions = (id) => ajax(BASE_URL + '/questions/' + id, {}, 'DELETE')

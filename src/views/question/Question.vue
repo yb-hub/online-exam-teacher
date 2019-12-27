@@ -66,7 +66,7 @@
           <el-button v-waves type="primary" icon="el-icon-edit" size="mini" @click="handleUpdate(row)">
             编辑题目
           </el-button>
-          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="confirmDeleteQue(row)">
+          <el-button v-waves type="danger" icon="el-icon-delete" size="mini" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -142,12 +142,11 @@
 </template>
 
 <script>
-import { reqGetSingleList, reqSearchSingleList, reqDeleteSingle, reqInsertSingleInfo, reqUpdateSingleInfo } from '@/api/bankManage'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import BackToTop from '@/components/BackToTop'
 
-import { getQuestions, insertQuestions, updateQuestions } from '@/api/question'
+import { getQuestions, insertQuestions, updateQuestions, deleteQuestions } from '@/api/question'
 import { getCoursesSimple } from '@/api/course'
 export default {
   name: 'Question',
@@ -400,143 +399,62 @@ export default {
         })
       }
     },
-    async handleUpdateSingle() {
-      const result = await reqUpdateSingleInfo(this.temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$message({
-          message: result.msg,
-          type: 'success'
-        })
-        this.getList()
-      } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
-        })
-      }
-    },
-    // async handleFilter() {
-    //   this.listQuery.page = 1
-    //   this.listLoading = true
-    //   let langId = this.listQuery.langId
-    //   if (this.listQuery.langId === null || this.listQuery.langId === undefined) {
-    //     langId = 0
-    //   }
-    //   let composeFlag = this.listQuery.composeFlag
-    //   if (this.listQuery.composeFlag === null || this.listQuery.composeFlag === undefined) {
-    //     composeFlag = undefined
-    //   }
-    //   const result = await reqSearchSingleList(this.listQuery.content, langId, composeFlag)
-    //   if (result.statu === 0) {
-    //     this.total = result.data.length
-    //     this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-    //   }
-    //   this.listLoading = false
-    // },
-    resetTemp() {
-      this.temp = {
-        content: '',
-        pictureSrc: '',
-        choiceA: '',
-        choiceB: '',
-        choiceC: '',
-        choiceD: '',
-        choiceE: '',
-        choiceF: '',
-        choiceG: '',
-        singleAnswer: '',
-        answerExplain: '',
-        langId: undefined
-      }
-    },
-    // handleCreate() {
-    //   this.resetTemp()
-    //   this.dialogStatus = '添加题目'
-    //   this.dialogFormVisible = true
-    //   this.$nextTick(() => {
-    //     this.$refs['dataForm'].clearValidate()
-    //   })
-    // },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.insertSingleInfo()
-        }
-      })
-    },
-    async insertSingleInfo() {
-      const result = await reqInsertSingleInfo(this.temp)
-      if (result.statu === 0) {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '添加成功',
-          type: 'success',
-          duration: 2000
-        })
-        this.getList()
-      } else {
-        this.$notify({
-          title: '失败',
-          message: result.msg,
-          type: 'error',
-          duration: 2000
-        })
-      }
-    },
-    confirmDeleteQue(row) {
+    // 删除问题
+    handleDelete(row) {
       this.$confirm('确定删除该题目吗?若题目已被组成试卷则无法删除', '提示', {
         confirmButtonText: '确定删除',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        if (row.composeFlag === '1') {
+        if (row.isPaper === '1') {
           this.$message({
             message: '该题目已被组成试卷，无法删除',
             type: 'error'
           })
         } else {
-          this.handleDeleteQue(row)
+          this.deleteQuestions(row)
         }
       }).catch(() => {
       })
     },
-    async handleDeleteQue(row) {
-      const singleId = row.singleId
-      const result = await reqDeleteSingle(singleId)
-      if (result.statu === 0) {
-        this.$message({
-          message: result.msg,
-          type: 'success'
+    async deleteQuestions(row) {
+      const result = await deleteQuestions(row.id)
+      if (result.code === 200) {
+        this.$notify({
+          title: '删除成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
         })
-        this.getList()
+        this.getQuestions()
       } else {
-        this.$message({
-          message: result.msg,
-          type: 'error'
+        this.$notify({
+          title: '删除失败',
+          message: result.message,
+          type: 'error',
+          duration: 2000
         })
       }
-    },
-    handleAvatarSuccess(res, file) {
-      // this.temp.pictureSrc = URL.createObjectURL(file.raw)
-      this.temp.pictureSrc = res.data
-    },
-    beforeAvatarUpload(file) {
-      const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
-      const isLt4M = file.size / 1024 / 1024 < 4
-
-      if (!isType) {
-        this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
-      }
-      if (!isLt4M) {
-        this.$message.error('上传头像图片大小不能超过 4MB!')
-      }
-      return isType && isLt4M
-    },
-    deletePictureSrc() {
-      this.temp.pictureSrc = ''
     }
+    // handleAvatarSuccess(res, file) {
+    //   // this.temp.pictureSrc = URL.createObjectURL(file.raw)
+    //   this.temp.pictureSrc = res.data
+    // },
+    // beforeAvatarUpload(file) {
+    //   const isType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
+    //   const isLt4M = file.size / 1024 / 1024 < 4
+    //
+    //   if (!isType) {
+    //     this.$message.error('上传头像图片只能是 JPG/PNG/GIF 格式!')
+    //   }
+    //   if (!isLt4M) {
+    //     this.$message.error('上传头像图片大小不能超过 4MB!')
+    //   }
+    //   return isType && isLt4M
+    // },
+    // deletePictureSrc() {
+    //   this.temp.pictureSrc = ''
+    // }
   }
 }
 </script>
