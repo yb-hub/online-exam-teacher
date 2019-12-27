@@ -235,7 +235,7 @@ export const constantRouterMap = [
       {
         path: 'upLoad',
         name: 'upLoad',
-        component: () => import('@/views/question/Question'),
+        component: () => import('@/views/question/QuestionUpload'),
         meta: { title: '题库上传', icon: 'info' }
       }
     ]

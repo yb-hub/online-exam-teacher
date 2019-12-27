@@ -8,3 +8,5 @@ export const insertQuestions = (question) => ajax(BASE_URL + '/questions', quest
 export const updateQuestions = (id, question) => ajax(BASE_URL + '/questions/' + id, question, 'PUT')
 
 export const deleteQuestions = (id) => ajax(BASE_URL + '/questions/' + id, {}, 'DELETE')
+
+export const insertQuestionList = (questionList) => ajax(BASE_URL + '/questions/list', questionList, 'POST')
