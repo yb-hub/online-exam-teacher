@@ -104,18 +104,18 @@ export const constantRouterMap = [
     ]
   },
 
-  {
-    path: '/paper',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Paper',
-        component: () => import('@/views/paper/paperInfo'),
-        meta: { title: '试卷管理', icon: 'form' }
-      }
-    ]
-  },
+  // {
+  //   path: '/paper',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Paper',
+  //       component: () => import('@/views/paper/paperInfo'),
+  //       meta: { title: '试卷管理', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/bank',
@@ -221,6 +221,18 @@ export const constantRouterMap = [
   //     }
   //   ]
   // },
+  {
+    path: '/paper',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'index',
+        component: ()=>import('@/views/paper/Paper'),
+        meta: {title: '试卷管理' , icon: 'info'},
+      }
+    ]
+  },
   {
     path: '/question',
     component: Layout,

@@ -9,7 +9,7 @@ export const deleteCourse = (id) => ajax(BASE_URL + '/courses/' + id, {}, 'DELET
 
 // export const updateCourse = (id, major) => ajax(BASE_URL + '/courses/' + id, major, 'PUT')
 
-export const getCoursesSimple = () => ajax(BASE_URL + '/courses/simple', 'GET')
+export const getCoursesSimple = () => ajax(BASE_URL + '/courses/simple')
 
 export const updateCourse = (id, course) => ajax(BASE_URL + '/courses/' + id, course, 'PUT')
 

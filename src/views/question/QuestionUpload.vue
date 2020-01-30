@@ -40,7 +40,8 @@ export default {
             '题目分值',
             '是否组卷',
             '所属课程',
-            '题目解析'
+            '题目解析',
+            '题目难度'
           ]
           excel.export_json_to_excel({
             header: tHeader,
@@ -94,6 +95,9 @@ export default {
           }
           if (key === '所属课程') {
             question.courseId = item[key]
+          }
+          if (key === '题目难度') {
+            question.difficultyDegree = item[key]
           }
         })
         questionList.push(question)
