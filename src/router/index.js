@@ -222,6 +222,18 @@ export const constantRouterMap = [
   //   ]
   // },
   {
+    path: '/paperInfo',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'index',
+        component: ()=>import('@/views/paper/PaperInfo'),
+        meta: {title: '试卷管理2' , icon: 'info'},
+      }
+    ]
+  },
+  {
     path: '/paper',
     component: Layout,
     children: [

@@ -246,7 +246,7 @@
 
 <script>
 /* eslint-disable */
-import { reqGetPapersList, reqSearchPapersList, reqDeletePaper, reqPaperQueDetailByPaperId, reqRandomInsertPaperInfo, reqFixedInsertPaperInfo, reqPaperQueDetailByLangId } from '@/api/paper'
+import { reqGetPapersList, reqSearchPapersList, reqDeletePaper, reqPaperQueDetailByPaperId, reqRandomInsertPaperInfo, reqFixedInsertPaperInfo, reqPaperQueDetailByLangId } from '@/api/paperInfo'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination

@@ -1,13 +1,5 @@
 import ajax from '@/config/ajax'
-const BASE_URL = 'http://localhost:8008'
-
-export const insertPaper = (paper) => ajax(BASE_URL + '/paper',paper,'POST')
-
-export const getPaperList = (listQuery) => ajax(BASE_URL + '/papers',listQuery)
-
-export const deletePaper = (id) => ajax(BASE_URL+'/paper/'+id,{},'DELETE')
-
-export const getPaperDetail = (id) => ajax(BASE_URL+'/paper/'+id)
+const BASE_URL = process.env.BASE_API
 // 获取全部公告信息
 export const reqGetPapersList = () => ajax(BASE_URL + '/getTeacherPapersList')
 // 获取搜素公告信息

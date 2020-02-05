@@ -28,7 +28,7 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @row-contextmenu="seePaperDetail"
+      @row-contextmenu="getPaperDetail"
     >
       <el-table-column label="序号" prop="id" sortable align="center" width="90">
         <template slot-scope="scope">
@@ -83,11 +83,15 @@
       <el-input v-model="filterText" placeholder="查找试卷问题关键字" style="margin-bottom:30px;"/>
       <el-tree
         ref="paperDataTree"
-        :data="paperData"
+        :data="paperQuestionList"
         :props="defaultProps"
         :filter-node-method="filterNode"
         class="filter-tree"
-      />
+      >
+        <span class="span-ellipsis" slot-scope="{ node, data }">
+        <span :title="node.label">{{ node.label }}</span>
+    </span>
+      </el-tree>
     </el-dialog>
 
     <!--随机组卷弹出框-->
@@ -190,7 +194,7 @@
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import BackToTop from '@/components/BackToTop'
   import {getCoursesSimple} from '@/api/course'
-  import {insertPaper,getPaperList,deletePaper} from '@/api/paper'
+  import {insertPaper, getPaperList, deletePaper, getPaperDetail} from '@/api/paper'
 
   export default {
     name: 'Paper',
@@ -232,39 +236,36 @@
         listLoading: true,
         total: 0,
         dialogFormVisible: false,
-
-        tableKey: 0,
-        list: null,
-        langOptions: [],
-        paperTypeOptions: [{label: '随机组卷', key: '1'}, {label: '固定组卷', key: '2'}],
-        temp: {
-          paperName: '',
-          paperDuration: '',
-          paperDifficulty: undefined,
-          paperAttention: '',
-          singleScore: undefined,
-          singleNum: undefined,
-          multipleScore: undefined,
-          multipleNum: undefined,
-          judgeScore: undefined,
-          judgeNum: undefined,
-          fillScore: undefined,
-          fillNum: undefined,
-          langId: undefined
+        paperDetail: {
+          type: '',
+          limitTime: '',
+          singleScore: 1,
+          totalSingleChoice: 0,
+          multiScore: 1,
+          totalMultiChoice: 0,
+          judgeScore: 1,
+          totalJudgeChoice: 0,
+          totalQuestion: 0,
+          totalScore: 0,
+          singleChoiceList: [],
+          multiChoiceList: [],
+          judgeChoiceList: []
         },
-        fixedDialogFormVisible: false,
-        paperDetailDialogFormVisible: false,
-        clickPaperTitle: '',
-        subPaperTitle: '',
-        minSubPaperTitle: '',
-        filterText: '',
-        fixedFilterText: '',
-        paperData: [],
-        fixedPaperData: [],
+        paperQuestionList: [],
         defaultProps: {
           children: 'children',
           label: 'label'
         },
+        clickPaperTitle: '',
+        subPaperTitle: '',
+        minSubPaperTitle: '',
+        filterText: '',
+        paperDetailDialogFormVisible: false,
+
+        tableKey: 0,
+        fixedDialogFormVisible: false,
+        fixedFilterText: '',
+        fixedPaperData: [],
         fixRules: {
           langId: [{required: true, message: '试卷名称为必填项', trigger: 'change'}],
           paperName: [{required: true, message: '试卷名称为必填项', trigger: 'change'}],
@@ -276,18 +277,17 @@
           fillScore: [{required: true, message: '填空题分数为必填项', trigger: 'change'}],
         },
         rules: {
-          langId: [{required: true, message: '试卷名称为必填项', trigger: 'change'}],
-          paperName: [{required: true, message: '试卷名称为必填项', trigger: 'change'}],
-          paperDuration: [{required: true, message: '考试时长为必填项', trigger: 'change'}],
-          paperDifficulty: [{required: true, message: '难度系数为必填项', trigger: 'change'}],
+          courseId: [{required: true, message: '试卷科目为必填项', trigger: 'change'}],
+          title: [{required: true, message: '试卷名称为必填项', trigger: 'change'}],
+          type: [{required: true, message: '考试类型为必填项', trigger: 'change'}],
+          limitTime:[{required:true,message:'考试时长为必填项',trigger: 'change'}],
+          difficultyDegree: [{required: true, message: '难度系数为必填项', trigger: 'change'}],
           singleScore: [{required: true, message: '单选题分数为必填项', trigger: 'change'}],
-          singleNum: [{required: true, message: '单选题数目为必填项', trigger: 'change'}],
-          multipleScore: [{required: true, message: '多选题分数为必填项', trigger: 'change'}],
-          multipleNum: [{required: true, message: '多选题数目为必填项', trigger: 'change'}],
+          totalSingleChoice: [{required: true, message: '单选题数目为必填项', trigger: 'change'}],
+          multiScore: [{required: true, message: '多选题分数为必填项', trigger: 'change'}],
+          totalMultiChoice: [{required: true, message: '多选题数目为必填项', trigger: 'change'}],
           judgeScore: [{required: true, message: '判断题分数为必填项', trigger: 'change'}],
-          judgeNum: [{required: true, message: '判断题数目为必填项', trigger: 'change'}],
-          fillScore: [{required: true, message: '填空题分数为必填项', trigger: 'change'}],
-          fillNum: [{required: true, message: '填空题数目为必填项', trigger: 'change'}],
+          totalJudgeChoice: [{required: true, message: '判断题数目为必填项', trigger: 'change'}],
         },
         downloadLoading: false,
 
@@ -324,6 +324,25 @@
       this.getCourseList()
     },
     methods: {
+      resetTemp() {
+        this.tempPaper = {
+          title: '',
+          type: '',
+          grade: '',
+          courseId: '',
+          limitTime: '',
+          difficultyDegree: '',
+          description: '',
+          singleScore: 1,
+          totalSingleChoice: 0,
+          multiScore: 1,
+          totalMultiChoice: 0,
+          judgeScore: 1,
+          totalJudgeChoice: 0,
+          totalQuestion: 0,
+          totalScore: 0
+        }
+      },
       //获取课程列表
       async getCourseList() {
         let result = await getCoursesSimple()
@@ -332,6 +351,14 @@
         }
       },
       //生成试卷
+      handleCreate() {
+        this.resetTemp()
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+
       insert() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
@@ -368,32 +395,104 @@
         this.listLoading = false
       },
       //搜索试卷
-      handleFilter(){
+      handleFilter() {
         this.getPaperList()
       },
       //删除试卷
-      handleDelete(row){
-        this.$confirm("确定要删除此试卷？",'提示',{
-          confirmButtonText:'确定删除',
-          cancelButtonText:'取消',
-          type:'warning'
-        }).then(()=>{
+      handleDelete(row) {
+        this.$confirm("确定要删除此试卷？", '提示', {
+          confirmButtonText: '确定删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
           this.deletePaper(row.id)
-        }).catch(()=>{})
+        }).catch(() => {
+        })
       },
-      async deletePaper(id){
+      async deletePaper(id) {
         const result = await deletePaper(id)
-        if(result.code === 200){
+        if (result.code === 200) {
           this.$message({
-            message:'删除成功',
-            type:'success'
+            message: '删除成功',
+            type: 'success'
           })
           this.getPaperList()
-        }else{
+        } else {
           this.$message({
-            message:result.message,
-            type:'error'
+            message: result.message,
+            type: 'error'
           })
+        }
+      },
+      //右键查看试卷详情
+      async getPaperDetail(row, columb, event) {
+        // 阻止鼠标右键默认事件
+        event.preventDefault()
+        let result = await getPaperDetail(row.id)
+        if (result.code === 200) {
+          let singleList = result.data.singleChoiceList
+          let multiList = result.data.multiChoiceList
+          let judgeList = result.data.judgeChoiceList
+          let singleData = []
+          let multiData = []
+          let judgeData = []
+          for (let i = 0; i < singleList.length; i++) {
+            let temp = {label: '', children: []}
+            let tempQuestion = singleList[i]
+            temp.label = tempQuestion.title
+            let tempChildren = []
+            for (let j = 0; j < tempQuestion.options.length; j++) {
+              let newTemp = {label: ''}
+              newTemp.label = tempQuestion.options[j].optionKey + ":" + tempQuestion.options[j].optionValue
+              tempChildren.push(newTemp)
+            }
+            tempChildren.push({label: '正确答案：' + tempQuestion.rightOption})
+            temp.children = tempChildren
+            singleData.push(temp)
+          }
+          for (let i = 0; i < multiList.length; i++) {
+            let temp = {label: '', children: []}
+            let tempQuestion = multiList[i]
+            temp.label = tempQuestion.title
+            let tempChildren = []
+            for (let j = 0; j < tempQuestion.options.length; j++) {
+              let newTemp = {label: ''}
+              newTemp.label = tempQuestion.options[j].optionKey + ":" + tempQuestion.options[j].optionValue
+              tempChildren.push(newTemp)
+            }
+            tempChildren.push({label: '正确答案：' + tempQuestion.rightOption})
+            temp.children = tempChildren
+            multiData.push(temp)
+          }
+          for (let i = 0; i < judgeList.length; i++) {
+            let temp = {label: '', children: []}
+            temp.label = judgeList[i].title
+            temp.children = [{label: '正确答案：' + (judgeList[i].judgeAnswer === 1 ? 'T' : 'F')}]
+            judgeData.push(temp)
+          }
+          //初始化数据
+          this.filterText = ''
+          this.clickPaperTitle = `试卷详情：${result.data.title}`
+          this.subPaperTitle = `试卷总分：${result.data.totalScore}分，试卷总题数：${result.data.totalQuestion}道。`
+          this.minSubPaperTitle = `单选题${result.data.totalSingleChoice}道（每道${result.data.singleScore}分），
+          多选题${result.data.totalMultiChoice}道（每道${result.data.multiScore}分），
+          判断题${result.data.totalJudgeChoice}道（每道${result.data.judgeScore}分）。`
+          this.paperQuestionList = [
+            {
+              label: '单选题',
+              children: singleData
+            },
+            {
+              label: '多选题',
+              children: multiData
+            },
+            {
+              label: '判断题',
+              children: judgeData
+            }
+          ]
+          // 显示弹出对话框
+          this.paperDetailDialogFormVisible = true
         }
       },
 
@@ -407,8 +506,8 @@
         let fillData = result.data.fillData
         //初始化数据
         this.filterText = ''
-        this.clickPaperTitle = `试卷详情：${row.paperName}`
-        this.subPaperTitle = `试卷总分：${row.totalScore}分，试卷总题数：${row.totalNum}道。`
+        this.clickPaperTitle = `试卷详情：${result.data.title}`
+        this.subPaperTitle = `试卷总分：${result.data.totalScore}分，试卷总题数：${row.totalNum}道。`
         this.minSubPaperTitle = `单选题${row.singleNum}道（每道${row.singleScore}分），多选题${row.multipleNum}道（每道${row.multipleScore}分），判断题${row.judgeNum}道（每道${row.judgeScore}分），填空题${row.fillNum}道（每道${row.fillScore}分）。`
         this.paperData = [{
           id: 1,
@@ -431,23 +530,7 @@
         this.paperDetailDialogFormVisible = true
       },
 
-      resetTemp() {
-        this.temp = {
-          paperName: '',
-          paperDuration: '',
-          paperDifficulty: undefined,
-          paperAttention: '',
-          singleScore: undefined,
-          singleNum: undefined,
-          multipleScore: undefined,
-          multipleNum: undefined,
-          judgeScore: undefined,
-          judgeNum: undefined,
-          fillScore: undefined,
-          fillNum: undefined,
-          langId: undefined
-        }
-      },
+
       handleFixedCreate() {
         this.fixedFilterText = ''
         this.fixedPaperData = []
@@ -573,13 +656,7 @@
           })
         }
       },
-      handleCreate() {
-        this.resetTemp()
-        this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
-      },
+
       async randomInsertPaperInfo() {
         let arr = this.temp.paperDuration.split(":")
         this.temp.paperDuration = parseInt(arr[0]) * 60 * 60 + parseInt(arr[1]) * 60
@@ -609,3 +686,12 @@
     }
   }
 </script>
+
+<style>
+  .span-ellipsis {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+</style>
