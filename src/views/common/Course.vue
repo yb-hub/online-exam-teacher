@@ -42,7 +42,6 @@
 
     <el-table
       v-loading="listLoading"
-      :key="tableKey"
       :data="courseList"
       :default-sort="{prop: 'id', order: 'ascending'}"
       border
@@ -98,6 +97,18 @@
               :value="item.id"/>
           </el-select>
         </el-form-item>
+        <el-form-item label="课程图片" prop="remark">
+          <el-upload
+            class="avatar-uploader"
+            action="http://localhost:8008/upload"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload">
+            <img v-if="dataForm.remark" :src="dataForm.remark" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -164,7 +175,8 @@
           courseId: '',
           majorId: '',
           name: '',
-          credit: ''
+          credit: '',
+          remark: ''
         },
         total: '',
         pages: '',
@@ -219,6 +231,7 @@
 
       //新增课程
       handleCreate() {
+        this.dataForm = {}
         this.dialogFormVisible = true
         this.dialogStatus = '添加'
       },
@@ -233,7 +246,8 @@
         const course = {
           majorId: this.dataForm.majorId,
           credit: this.dataForm.credit,
-          name: this.dataForm.name
+          name: this.dataForm.name,
+          remark: this.dataForm.remark
         }
         let result = await insertCourse(course)
         if (result.code === 200) {
@@ -254,6 +268,23 @@
           })
         }
       },
+      //上传课程图片
+      handleAvatarSuccess(res, file) {
+        this.$set(this.dataForm,'remark',res.data)
+      },
+      beforeAvatarUpload(file) {
+        const fileType = ['image/jpeg','image/png']
+        const isJPG = fileType.indexOf(file.type);
+        const isLt2M = file.size / 1024 / 1024 < 10;
+
+        if (isJPG === -1) {
+          this.$message.error('上传头像图片只能是 JPG/PNG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 10MB!');
+        }
+        return isJPG && isLt2M;
+      },
       //编辑课程
       handleUpdate(row) {
         this.dialogStatus = '编辑'
@@ -262,12 +293,13 @@
         this.dataForm.name = row.name
         this.dataForm.credit = row.credit
         this.dataForm.majorId = row.majorId
+        this.dataForm.remark = row.remark
       },
       update() {
         this.updateCourse()
       },
       async updateCourse() {
-        const course = { name: this.dataForm.name, majorId: this.dataForm.majorId, credit: this.dataForm.credit }
+        const course = { name: this.dataForm.name, majorId: this.dataForm.majorId, credit: this.dataForm.credit,remark: this.dataForm.remark }
         let result = await updateCourse(this.dataForm.courseId, course)
         console.log(result)
         if (result.code === 200) {
@@ -326,3 +358,29 @@
 
   }
 </script>
+
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>
