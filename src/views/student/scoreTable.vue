@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column label="姓名" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.studentName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="头像" align="center">
@@ -46,12 +46,18 @@
       </el-table-column>
       <el-table-column label="试卷名称" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.paperName }}</span>
+          <span>{{ scope.row.paperTitle }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="score" label="试卷总分" sortable align="center">
+        <template slot-scope="scope">
+          <span v-if="scope.row.totalScore">{{ scope.row.totalScore }}分</span>
+          <span v-else style="color: #FF0000">0分</span>
         </template>
       </el-table-column>
       <el-table-column prop="score" label="考试分数" sortable align="center">
         <template slot-scope="scope">
-          <span v-if="scope.row.score">{{ scope.row.score }}分</span>
+          <span v-if="scope.row.resultScore">{{ scope.row.resultScore }}分</span>
           <span v-else style="color: #FF0000">0分</span>
         </template>
       </el-table-column>
@@ -113,8 +119,8 @@ import BookTypeOption from './components/BookTypeOption'
         listQuery: {
           page: 1,
           limit: 10,
-          studentId: undefined,
-          paperId: undefined
+          studentId: '',
+          paperId: ''
         },
         paperNameOptions: [],
         downloadLoading: false,
@@ -138,7 +144,7 @@ import BookTypeOption from './components/BookTypeOption'
         this.listLoading = true
         let result = await getExamResult(this.listQuery)
         if (result.code === 200){
-          this.list = result.data
+          this.list = result.data.data
           //this.paperNameOptions = result.data.papersList
           //this.total = result.data.scoresList.length
           //this.list = result.data.scoresList.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))

@@ -1,6 +1,6 @@
 import ajax from '@/config/ajax'
- const BASE_URL = process.env.BASE_API
-//const BASE_URL = 'http://localhost:8008'
+ // const BASE_URL = process.env.BASE_API
+const BASE_URL = 'http://localhost:8008'
 
 // 获取全部学生信息
 export const reqGetStudentsList = () => ajax(BASE_URL + '/getStudentsList')
@@ -37,4 +37,4 @@ export const getStudentList = (listQuery) => ajax(BASE_URL + '/teacher/student',
 //修改学生状态
 export const updateStudent = (studentId,status) => ajax(BASE_URL + '/teacher/student/'+studentId,{'isDelete':status},'PUT')
 //获取学生的考试结果
-export const getExamResult = (listQuery) =>ajax(BASE_URL + '/teacher/examresult',{'studentId':listQuery.studentId,'paperId':listQuery.paperId})
+export const getExamResult = (listQuery) =>ajax(BASE_URL + '/teacher/examresult',{'studentId':listQuery.studentId,'paperId':listQuery.paperId,'page':listQuery.page,'limit':listQuery.limit})
