@@ -36,7 +36,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
 import { removeStore } from '@/utils/mUtils'
-import { reqLogOut } from '@/api/login'
+import { teacherLogout } from '@/api/login'
 
 export default {
   components: {
@@ -69,14 +69,14 @@ export default {
       })
     },
     async logout() {
-      const result = await reqLogOut()
-      if (result.statu === 0) {
+      const result = await teacherLogout()
+      if (result.code === 200) {
         // 移除localStorage中teacherInfo
         removeStore('teacherInfo')
         // 重置vuex中userInfo
         this.$store.dispatch('resetUserInfo')
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'success'
         })
         // 为了重新实例化vue-router对象 避免bug

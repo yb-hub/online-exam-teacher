@@ -9,42 +9,42 @@
       <div style="padding-top:35px;" class="progress-item">
         <div class="info_item">
           <span>教师ID</span>
-          <span>{{ userInfo.tno }}</span>
+          <span>{{ userInfo.teacherId }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>
       <div class="progress-item">
         <div class="info_item">
           <span>姓名</span>
-          <span>{{ userInfo.teaName }}</span>
+          <span>{{ userInfo.name }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>
       <div class="progress-item">
         <div class="info_item">
           <span>性别</span>
-          <span>{{ userInfo.teaSex }}</span>
+          <span>{{ userInfo.sex == '1' ? '男' : '女' }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>
       <div class="progress-item">
         <div class="info_item">
           <span>邮箱</span>
-          <span>{{ userInfo.teaEmail }}</span>
+          <span>{{ userInfo.email }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>
       <div class="progress-item">
         <div class="info_item">
           <span>手机号码</span>
-          <span>{{ userInfo.teaPhone }}</span>
+          <span>{{ userInfo.phone }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>
       <div class="progress-item">
         <div class="info_item">
           <span>最近登录时间</span>
-          <span>{{ userInfo.teaLastLoginTime | date-format }}</span>
+          <span>{{ userInfo.lastLoginTime | date-format }}</span>
         </div>
         <el-progress :percentage="100" status="success" />
       </div>

@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.sno" placeholder="搜索学号" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.stuName" placeholder="搜索姓名" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.stuSex" placeholder="搜索性别" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in stuSexOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
+      <el-input v-model="listQuery.studentId" placeholder="搜索学号" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.name" placeholder="搜索姓名" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
+<!--      <el-select v-model="listQuery.stuSex" placeholder="搜索性别" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @change="handleFilter">-->
+<!--        <el-option v-for="item in stuSexOptions" :key="item.key" :label="item.label" :value="item.key" />-->
+<!--      </el-select>-->
       <el-button v-waves class="filter-item" style="margin-right: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -15,16 +15,16 @@
       <el-button v-waves :loading="downloadLoading" style="margin-left: 0;margin-right: 10px;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出当前页学生信息
       </el-button>
-      <el-button v-waves :loading="downloadLoading" style="margin-left: 0;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownloadAll">
-        导出全部学生信息
-      </el-button>
+<!--      <el-button v-waves :loading="downloadLoading" style="margin-left: 0;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownloadAll">-->
+<!--        导出全部学生信息-->
+<!--      </el-button>-->
     </div>
 
     <el-table
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
-      :default-sort = "{prop: 'sno', order: 'ascending'}"
+      :default-sort = "{prop: 'studentId', order: 'ascending'}"
       border
       fit
       highlight-current-row
@@ -32,54 +32,48 @@
     >
       <el-table-column label="学号" prop="sno" sortable align="center" width="140">
         <template slot-scope="scope">
-          <span>{{ scope.row.sno }}</span>
+          <span>{{ scope.row.studentId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="姓名" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.stuName }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="头像" align="center">
         <template slot-scope="scope">
           <viewer>
-            <img :src="scope.row.stuImgSrc || require('@/assets/images/profile.jpg')" style="width: 40px;height: 40px;border-radius: 5px">
+            <img :src="scope.row.remark || require('@/assets/images/profile.jpg')" style="width: 40px;height: 40px;border-radius: 5px">
           </viewer>
         </template>
       </el-table-column>
       <el-table-column label="性别" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.stuSex }}</span>
+          <span>{{ scope.row.sex == '1' ? '男' : '女' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="邮箱" align="center" width="140">
         <template slot-scope="scope">
-          <span>{{ scope.row.stuEmail || '暂无绑定邮箱' }}</span>
+          <span>{{ scope.row.email || '暂无绑定邮箱' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机号" align="center" width="140">
         <template slot-scope="scope">
-          <span>{{ scope.row.stuPhone || '暂无绑定手机号' }}</span>
+          <span>{{ scope.row.phoneNumber || '暂无绑定手机号' }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="stuCreateTime" sortable label="注册时间" align="center" width="160">
         <template slot-scope="scope">
-          <span>{{ scope.row.stuCreateTime | date-format }}</span>
+          <span>{{ scope.row.createTime | date-format }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="stuLastLoginTime" sortable label="最近登录时间" align="center" width="160">
-        <template slot-scope="scope">
-          <span v-if="scope.row.stuLastLoginTime">{{ scope.row.stuLastLoginTime | date-format }}</span>
-          <span v-else>暂无最近登录记录</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding" width="120">
-        <template slot-scope="{row}">
-          <el-button v-waves type="primary" icon="el-icon-setting" size="mini" @click="confirmUpdatePsw(row)">
-            重置密码
-          </el-button>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="操作" align="center" class-name="small-padding" width="120">-->
+<!--        <template slot-scope="{row}">-->
+<!--          <el-button v-waves type="primary" icon="el-icon-setting" size="mini" @click="confirmUpdatePsw(row)">-->
+<!--            重置密码-->
+<!--          </el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="登录权限" align="center" class-name="small-padding" width="120">
         <template slot-scope="{row}">
           <!--<el-switch
@@ -88,10 +82,10 @@
             active-color="#13ce66"
             inactive-color="#ff4949"/>
           <span :style="{ color: row.stuStatus === '1' ? 'green' : 'red', fontWeight:'bold' }">{{ row.stuStatus === '1'?'已启用':'已禁用' }}</span>-->
-          <el-button v-waves v-if="row.stuStatus=='1'" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,'0')">
+          <el-button v-waves v-if="row.isDelete==0" size="mini" icon="el-icon-success" type="success" @click="handleModifyStatus(row,1)">
             启用状态
           </el-button>
-          <el-button v-waves v-if="row.stuStatus=='0'" size="mini" icon="el-icon-error" type="danger" @click="handleModifyStatus(row,'1')">
+          <el-button v-waves v-if="row.isDelete==1" size="mini" icon="el-icon-error" type="danger" @click="handleModifyStatus(row,0)">
             禁用状态
           </el-button>
         </template>
@@ -102,17 +96,23 @@
 
     <el-dialog :visible.sync="dialogFormVisible" title="添加">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="学号" prop="sno">
-          <el-input v-model="temp.sno" />
+        <el-form-item label="学号" prop="studentId">
+          <el-input v-model="temp.studentId" />
         </el-form-item>
-        <el-form-item label="密码" prop="stuPsw">
-          <el-input v-model="temp.stuPsw" />
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="temp.password" />
         </el-form-item>
-        <el-form-item label="姓名" prop="stuName">
-          <el-input v-model="temp.stuName" />
+        <el-form-item label="电话" prop="phoneNumber">
+          <el-input v-model="temp.phoneNumber" />
         </el-form-item>
-        <el-form-item label="性别" prop="stuSex">
-          <el-select v-model="temp.stuSex" class="filter-item">
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="temp.email" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="temp.name" />
+        </el-form-item>
+        <el-form-item label="性别" prop="sex">
+          <el-select v-model="temp.sex" class="filter-item">
             <el-option v-for="item in stuSexOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -137,7 +137,7 @@
 
 <script>
 /* eslint-disable */
-import { reqGetStudentsList, reqUpdateStudentInfo, reqSearchStudentsList, reqInsertStudentInfo } from '@/api/student'
+import { getStudentList, updateStudent, reqSearchStudentsList, insertStudent } from '@/api/student'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -156,23 +156,24 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        sno: undefined,
-        stuName: undefined,
-        stuSex: undefined
+        studentId: '',
+        name: '',
       },
-      stuSexOptions: [{ label: '男', key: '男' }, { label: '女', key: '女' }],
+      stuSexOptions: [{ label: '男', key: '1' }, { label: '女', key: '0' }],
       temp: {
-        sno: '',
-        stuPsw: '123456',
-        stuName: '',
-        stuSex:'男'
+        studentId: '',
+        password: '123456',
+        name: '',
+        sex: '1',
+        phoneNumber: '',
+        email: ''
       },
       dialogFormVisible: false,
       rules: {
-        sno: [{ required: true, message: '学号为必填项', trigger: 'blur' },{ min: 12, max: 12, message: '学号必须为12位数字', trigger: 'blur' }],
-        stuPsw: [{ required: true, message: '密码为必填项，默认设置密码为123456', trigger: 'blur' }],
-        stuName: [{ required: true, message: '姓名为必填项', trigger: 'blur' }],
-        stuSex: [{ required: true, message: '性别为必填项，默认选择男', trigger: 'blur' }]
+        studentId: [{ required: true, message: '学号为必填项', trigger: 'blur' },{ min: 8, max: 12, message: '学号必须为8-12位数字', trigger: 'blur' }],
+        password: [{ required: true, message: '密码为必填项，默认设置密码为123456', trigger: 'blur' }],
+        name: [{ required: true, message: '姓名为必填项', trigger: 'blur' }],
+        sex: [{ required: true, message: '性别为必填项，默认选择男', trigger: 'blur' }]
       },
       downloadLoading: false,
       myBackToTopStyle: {
@@ -190,12 +191,14 @@ export default {
     this.getList()
   },
   methods: {
+    //获取学生列表
     async getList() {
       this.listLoading = true
-      let result = await reqGetStudentsList()
-      if (result.statu === 0){
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+      let result = await getStudentList(this.listQuery)
+      if (result.code === 200){
+        this.total = result.data.total
+        // this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+        this.list = result.data.data
       }
       // 延迟0.5秒等待请求数据
       setTimeout(() => {
@@ -203,10 +206,9 @@ export default {
       }, 500)
     },
     async handleModifyStatus(row, status) {
-      row.stuStatus = status
-      let result = await reqUpdateStudentInfo(row)
-      if (result.statu === 0){
-        if (status === '1'){
+      let result = await updateStudent(row.studentId,status)
+      if (result.code === 200){
+        if (status === '0'){
           this.$message({
             message: '启用成功',
             type: 'success'
@@ -217,10 +219,11 @@ export default {
             type: 'error'
           })
         }
+        this.getList()
       }
       else {
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'error'
         })
       }
@@ -252,25 +255,19 @@ export default {
     },
     async handleFilter(){
       this.listQuery.page = 1
-      this.listLoading = true
-      let result = await reqSearchStudentsList(this.listQuery.sno, this.listQuery.stuName, this.listQuery.stuSex)
-      if (result.statu === 0){
-        this.total = result.data.length
-        this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-      }
-      // 延迟一秒等待请求数据
-      setTimeout(() => {
-        this.listLoading = false
-      }, 500)
+      this.getList()
     },
     resetTemp(){
       this.temp = {
-        sno: '',
-        stuPsw: '123456',
-        stuName: '',
-        stuSex:'男'
+        studentId: '',
+        password: '123456',
+        name: '',
+        sex: '1',
+        phoneNumber: '',
+        email: ''
       }
     },
+    //新增考生
     handleCreate(){
       this.resetTemp()
       this.dialogFormVisible = true
@@ -286,8 +283,8 @@ export default {
       })
     },
     async insertStudentInfo(){
-      let result = await reqInsertStudentInfo(this.temp)
-      if (result.statu === 0){
+      let result = await insertStudent(this.temp)
+      if (result.code === 200){
         this.dialogFormVisible = false
         this.$notify({
           title: '成功',
@@ -299,17 +296,18 @@ export default {
       } else {
         this.$notify({
           title: '失败',
-          message: result.msg,
+          message: result.message,
           type: 'error',
           duration: 2000
         })
       }
     },
+
     handleDownload(){
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['学号', '姓名', '性别', '邮箱', '手机号', '注册时间', '最近登录时间', '登录权限']
-        const filterVal = ['sno', 'stuName', 'stuSex', 'stuEmail', 'stuPhone', 'stuCreateTime', 'stuLastLoginTime', 'stuStatus']
+        const tHeader = ['学号', '姓名', '性别', '邮箱', '手机号', '注册时间','登录权限']
+        const filterVal = ['studentId', 'name', 'sex', 'email', 'phoneNumber', 'createTime', 'isDelete']
         const data = this.formatJson(filterVal, this.list)
         excel.export_json_to_excel({
           header: tHeader,
@@ -319,22 +317,22 @@ export default {
         this.downloadLoading = false
       })
     },
-    async handleDownloadAll(){
-      this.downloadLoading = true
-      let result = await reqGetStudentsList()
-      let list = result.data
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['学号', '姓名', '性别', '邮箱', '手机号', '注册时间', '最近登录时间', '登录权限']
-        const filterVal = ['sno', 'stuName', 'stuSex', 'stuEmail', 'stuPhone', 'stuCreateTime', 'stuLastLoginTime', 'stuStatus']
-        const data = this.formatJson(filterVal, list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: '全部学生信息表'
-        })
-        this.downloadLoading = false
-      })
-    },
+    // async handleDownloadAll(){
+    //   this.downloadLoading = true
+    //   let result = await getStudentList()
+    //   let list = result.data
+    //   import('@/vendor/Export2Excel').then(excel => {
+    //     const tHeader = ['学号', '姓名', '性别', '邮箱', '手机号', '注册时间','登录权限']
+    //     const filterVal = ['studentId', 'name', 'sex', 'email', 'phoneNumber', 'createTime', 'isDelete']
+    //     const data = this.formatJson(filterVal, list)
+    //     excel.export_json_to_excel({
+    //       header: tHeader,
+    //       data,
+    //       filename: '全部学生信息表'
+    //     })
+    //     this.downloadLoading = false
+    //   })
+    // },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
         if (j === 'stuCreateTime' || j === 'stuLastLoginTime') {

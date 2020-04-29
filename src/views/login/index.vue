@@ -37,14 +37,14 @@
 </template>
 
 <script>
-import { reqLogin } from '@/api/login'
+import { teacherLogin } from '@/api/login'
 import { setStore } from '@/utils/mUtils'
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (value.length !== 6) {
-        callback(new Error('请输入6位数字的教工号'))
+      if (value.length !== 11) {
+        callback(new Error('请输入11位的教工号'))
       } else {
         callback()
       }
@@ -98,21 +98,21 @@ export default {
       })
     },
     async teacherLogin() {
-      const result = await reqLogin(this.loginForm.username, this.loginForm.password)
-      if (result.statu === 0) {
+      const result = await teacherLogin(this.loginForm.username, this.loginForm.password)
+      if (result.code === 200) {
         this.loading = false
         this.$store.dispatch('recordUserInfo', result.data)
         // 将userInfo存入localSession
         setStore('teacherInfo', result.data)
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'success'
         })
         this.$router.push({ path: this.redirect || '/' })
       } else {
         this.loading = false
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'warning'
         })
       }
