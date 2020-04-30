@@ -2,7 +2,7 @@
   <div v-loading="listLoading" class="chart-container">
     <div class="chart-select">
       <el-select v-model="paperId" class="filter-item">
-        <el-option v-for="item in paperNameOptions" :key="item.key" :label="item.label" :value="item.key"/>
+        <el-option v-for="item in paperSimpleList" :key="item.paperId" :label="item.paperTitle" :value="item.paperId"/>
       </el-select>
     </div>
     <chart height="98%" width="100%"/>
@@ -11,7 +11,7 @@
 
 <script>
 import Chart from '@/components/Charts/mixChart'
-import { reqGetPapersList } from '@/api/student'
+import { getPaperList } from '@/api/student'
 import { setStore } from '@/utils/mUtils'
 export default {
   name: 'ScoreChart',
@@ -20,7 +20,8 @@ export default {
     return {
       listLoading: true,
       paperId: this.$store.state.teacher.paperId,
-      paperNameOptions: []
+      paperName: this.$store.state.teacher.paperName,
+      paperSimpleList: []
     }
   },
   watch: {
@@ -34,16 +35,17 @@ export default {
   created() {
     this.getList()
   },
-  beforeDestroy() {
-    this.$store.dispatch('resetPaperId')
-    setStore('paperId', 1)
-  },
+  // beforeDestroy() {
+  //   //this.$store.dispatch('resetPaperId')
+  //  setStore('paperId', this.paperSimpleList[0].paperTitle)
+  // },
   methods: {
     async getList() {
       this.listLoading = true
-      const result = await reqGetPapersList()
-      if (result.statu === 0) {
-        this.paperNameOptions = result.data.papersList
+      const result = await getPaperList()
+      if (result.code === 200) {
+        this.paperSimpleList = result.data
+        this.paperId = this.paperSimpleList[0].paperId
       }
       // 延迟0秒等待请求数据
       setTimeout(() => {

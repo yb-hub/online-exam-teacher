@@ -1,5 +1,5 @@
 import ajax from '@/config/ajax'
- // const BASE_URL = process.env.BASE_API
+//const BASE_URL = process.env.BASE_API
 const BASE_URL = 'http://localhost:8008'
 
 // 获取全部学生信息
@@ -40,3 +40,5 @@ export const updateStudent = (studentId,status) => ajax(BASE_URL + '/teacher/stu
 export const getExamResult = (listQuery) =>ajax(BASE_URL + '/teacher/examresult',{'studentId':listQuery.studentId,'paperId':listQuery.paperId,'page':listQuery.page,'limit':listQuery.limit})
 //获取试卷simple列表
 export const getPaperList = ()=>ajax(BASE_URL + '/teacher/paper/simple',{})
+//获取试卷数据统计
+export const getExamresultChartData = (paperId)=>ajax(BASE_URL + '/teacher/examresult/chart/'+paperId)

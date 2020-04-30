@@ -6,7 +6,7 @@
 import echarts from 'echarts'
 import resize from './mixins/resize'
 import { mapGetters } from 'vuex'
-import { reqGetChartData } from '@/api/student'
+import { getExamresultChartData } from '@/api/student'
 
 export default {
   mixins: [resize],
@@ -32,29 +32,30 @@ export default {
     return {
       titleText: '学生成绩信息图表',
       chart: null,
+      examresultChartData:[],
+
       snoData: [],
       singleData: [],
       multipleData: [],
       judgeData: [],
-      fillData: [],
       scoreData: [],
-      timeUsedData: [],
-      paperInfo: {}
+
     }
   },
   computed: {
     ...mapGetters([
       'paperId',
-      'device'
+      'device',
+      'paperName'
     ])
   },
   watch: {
     paperId(newValue) {
       this.getChartData(() => {
-        if (!this.snoData.length) {
+        if (!this.examresultChartData.length) {
           this.titleText = '该试卷暂无人参加考试'
         } else {
-          this.titleText = `${this.paperInfo.paperName}(总分：${this.paperInfo.totalScore}分，考试时长：${this.paperInfo.paperDuration / 60}分钟，难度系数：${this.paperInfo.paperDifficulty})`
+          this.titleText = this.paperName
         }
         this.chart.clear()
         this.initChart()
@@ -63,7 +64,6 @@ export default {
   },
   mounted() {
     this.getChartData(() => {
-      this.titleText = `${this.paperInfo.paperName}(总分：${this.paperInfo.totalScore}分，考试时长：${this.paperInfo.paperDuration / 60}分钟，难度系数：${this.paperInfo.paperDifficulty})`
       this.initChart()
     })
   },
@@ -76,20 +76,26 @@ export default {
   },
   methods: {
     async getChartData(callback) {
-      const result = await reqGetChartData(this.paperId)
-      if (result.statu === 0) {
-        this.snoData = result.data.snoData
-        this.singleData = result.data.singleData
-        this.multipleData = result.data.multipleData
-        this.judgeData = result.data.judgeData
-        this.fillData = result.data.fillData
-        this.scoreData = result.data.scoreData
-        this.timeUsedData = result.data.timeUsedData
-        this.paperInfo = result.data.paperInfo
+      const result = await getExamresultChartData(this.paperId)
+      if (result.code === 200) {
+        this.examresultChartData = result.data
+        const exData = this.examresultChartData
+          this.snoData=[]
+          this.singleData=[]
+          this.multipleData=[]
+          this.judgeData=[]
+          this.scoreData=[]
+        for (let i = 0; i < this.examresultChartData.length; i++) {
+          this.snoData.push(exData[i].studentId+'-'+exData[i].studentName)
+          this.singleData.push(exData[i].rightSingle)
+          this.multipleData.push(exData[i].rightMulti)
+          this.judgeData.push(exData[i].rightJudge)
+          this.scoreData.push(exData[i].totalScore)
+        }
         callback && callback()
       } else {
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'error'
         })
       }
@@ -135,7 +141,7 @@ export default {
           textStyle: {
             color: '#90979c'
           },
-          data: ['单选题得分', '多选题得分', '判断题得分', '填空题得分', '总分', '花费时间（秒）']
+          data: ['单选题得分', '多选题得分', '判断题得分','总分']
         },
         calculable: true,
         xAxis: [{
@@ -272,26 +278,6 @@ export default {
           },
 
           {
-            name: '填空题得分',
-            type: 'bar',
-            stack: 'total',
-            itemStyle: {
-              normal: {
-                color: 'rgba(99, 194, 255, 1)',
-                barBorderRadius: 0,
-                label: {
-                  show: true,
-                  position: 'top',
-                  formatter(p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: this.fillData
-          },
-
-          {
             name: '总分',
             type: 'line',
             stack: 'total',
@@ -313,29 +299,8 @@ export default {
             data: this.scoreData
           },
 
-          {
-            name: '花费时间（秒）',
-            type: 'line',
-            stack: 'total',
-            symbolSize: 10,
-            symbol: 'circle',
-            itemStyle: {
-              normal: {
-                color: 'rgba(152,230,48,1)',
-                barBorderRadius: 0,
-                label: {
-                  show: true,
-                  position: 'top',
-                  formatter(p) {
-                    return p.value > 0 ? p.value : ''
-                  }
-                }
-              }
-            },
-            data: this.timeUsedData
-          }
         ]
-      })
+      },true)
     }
   }
 }
