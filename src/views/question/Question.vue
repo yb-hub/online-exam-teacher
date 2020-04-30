@@ -51,14 +51,18 @@
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="是否被组成试卷" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.isPaper === '1' ? '是' : '否' }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="所属科目" align="center">
         <template slot-scope="scope">
-          <div>{{ scope.row.courseId }}</div>
+          <div>{{ scope.row.courseName }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column label="难度系数" align="center">
+        <template slot-scope="scope">
+          <el-rate
+            v-model="scope.row.difficultyDegree"
+            disabled
+            text-color="#ff9900"
+            score-template="{value}"/>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding" width="240">
@@ -88,8 +92,8 @@
           <el-radio v-model="tempQuestion.type" :label="2">多选题</el-radio>
           <el-radio v-model="tempQuestion.type" :label="3">判断题</el-radio>
         </el-form-item>
-        <el-form-item label="题目分值" prop="score">
-          <el-input v-model="tempQuestion.score"/>
+        <el-form-item label="题目难度" prop="score">
+          <el-input v-model="tempQuestion.difficultyDegree"/>
         </el-form-item>
         <el-form-item v-show="tempQuestion.type!=3" label="题目选项" prop="options" >
           <div v-for="(option) in tempQuestion.options" :key="option.optionKey">
@@ -118,10 +122,10 @@
             <el-option v-for="item in courseList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="是否组卷" prop="isPaper">
-          <el-radio v-model="tempQuestion.isPaper" :label="1">考试题</el-radio>
-          <el-radio v-model="tempQuestion.isPaper" :label="0">测试题</el-radio>
-        </el-form-item>
+<!--        <el-form-item label="是否组卷" prop="isPaper">-->
+<!--          <el-radio v-model="tempQuestion.isPaper" :label="1">考试题</el-radio>-->
+<!--          <el-radio v-model="tempQuestion.isPaper" :label="0">测试题</el-radio>-->
+<!--        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -183,7 +187,6 @@ export default {
       ],
       listQuery: {
         page: 1,
-        pageSize: 10,
         limit: 10,
         keyWord: '',
         courseId: '',
@@ -204,6 +207,7 @@ export default {
         ],
         rightOption: [],
         score: '',
+        difficultyDegree: '',
         judgeAnswer: ''
       },
       tableKey: 0,
@@ -230,7 +234,6 @@ export default {
       rules: {
         title: [{ required: true, message: '题目内容为必填项', trigger: 'change' }],
         type: [{ required: true, message: '题目类型为必选项', trigger: 'change' }],
-        analysis: [{ required: true, message: '题目答案为必填项', trigger: 'change' }],
         courseId: [{ required: true, message: '所属科目为必填项', trigger: 'change' }]
       },
       downloadLoading: false,
@@ -256,7 +259,9 @@ export default {
       const result = await getQuestions(this.listQuery)
       console.log(result)
       if (result.code === 200) {
-        this.questionList = result.data
+        this.questionList = result.data.data
+        this.listQuery.page = result.data.pageNum
+        this.total = result.data.total
         this.listLoading = false
       }
     },

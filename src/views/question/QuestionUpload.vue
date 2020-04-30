@@ -37,8 +37,6 @@ export default {
             '选项（选择题）',
             '正确答案（选择题）',
             '正确答案（判断题（1为T,2为F）',
-            '题目分值',
-            '是否组卷',
             '所属课程',
             '题目解析',
             '题目难度'
@@ -84,12 +82,6 @@ export default {
           if (key === '正确答案（判断题（1为T,2为F）') {
             question.judgeAnswer = item[key]
           }
-          if (key === '题目分值') {
-            question.score = item[key]
-          }
-          if (key === '是否组卷') {
-            question.isPaper = item[key]
-          }
           if (key === '题目解析') {
             question.analysis = item[key]
           }
@@ -112,12 +104,12 @@ export default {
       const result = await insertQuestionList(questionList)
       if (result.code === 200) {
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'success'
         })
       } else {
         this.$message({
-          message: result.msg,
+          message: result.message,
           type: 'error'
         })
       }
