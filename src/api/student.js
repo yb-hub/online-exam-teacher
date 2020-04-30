@@ -38,3 +38,5 @@ export const getStudentList = (listQuery) => ajax(BASE_URL + '/teacher/student',
 export const updateStudent = (studentId,status) => ajax(BASE_URL + '/teacher/student/'+studentId,{'isDelete':status},'PUT')
 //获取学生的考试结果
 export const getExamResult = (listQuery) =>ajax(BASE_URL + '/teacher/examresult',{'studentId':listQuery.studentId,'paperId':listQuery.paperId,'page':listQuery.page,'limit':listQuery.limit})
+//获取试卷simple列表
+export const getPaperList = ()=>ajax(BASE_URL + '/teacher/paper/simple',{})

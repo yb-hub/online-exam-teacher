@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input v-model="listQuery.studentId" placeholder="搜索学号" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.paperId" placeholder="搜索试卷" clearable style="width: 200px;margin-right: 15px;" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in paperNameOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-option v-for="item in paperSimpleList" :key="item.paperId" :label="item.paperTitle" :value="item.paperId" />
       </el-select>
       <el-button v-waves class="filter-item" style="margin-right: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -12,9 +12,9 @@
       <el-button v-waves :loading="downloadLoading" style="margin-left: 0;margin-right: 10px;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出当前页学生成绩
       </el-button>
-      <el-button v-waves :loading="downloadLoading" style="margin-left: 0;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownloadAll">
-        导出全部学生成绩
-      </el-button>
+<!--      <el-button v-waves :loading="downloadLoading" style="margin-left: 0;" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownloadAll">-->
+<!--        导出全部学生成绩-->
+<!--      </el-button>-->
     </div>
 
     <el-table
@@ -52,7 +52,7 @@
       <el-table-column prop="score" label="试卷总分" sortable align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.totalScore">{{ scope.row.totalScore }}分</span>
-          <span v-else style="color: #FF0000">0分</span>
+          <span v-else style="color: #ff0000">0分</span>
         </template>
       </el-table-column>
       <el-table-column prop="score" label="考试分数" sortable align="center">
@@ -99,7 +99,7 @@
 
 <script>
 /* eslint-disable */
-import { getExamResult, reqDeleteScore, reqSearchScoresList } from '@/api/student'
+import { getExamResult, getPaperList } from '@/api/student'
 import waves from '@/directive/waves' // Waves directive
 import { parseTime, timeUsedFormat } from '@/utils'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -122,7 +122,7 @@ import BookTypeOption from './components/BookTypeOption'
           studentId: '',
           paperId: ''
         },
-        paperNameOptions: [],
+        paperSimpleList: [],
         downloadLoading: false,
         myBackToTopStyle: {
           right: '50px',
@@ -138,8 +138,16 @@ import BookTypeOption from './components/BookTypeOption'
     },
     created() {
       this.getList()
+      this.getPaperList()
     },
     methods: {
+      //获取试卷列表
+      async getPaperList(){
+        const result = await getPaperList()
+        if(result.code === 200){
+          this.paperSimpleList = result.data
+        }
+      },
       async getList() {
         this.listLoading = true
         let result = await getExamResult(this.listQuery)
@@ -164,43 +172,44 @@ import BookTypeOption from './components/BookTypeOption'
         }).catch(() => {
         })
       },
-      async handleDeleteScore(row) {
-        let result = await reqDeleteScore(row)
-        if (result.statu === 0){
-          this.$message({
-            message: '删除成功，该考生可重新进行该试卷的考试',
-            type: 'success'
-          })
-          this.getList()
-        } else {
-          this.$message({
-            message: result.msg,
-            type: 'error'
-          })
-        }
-      },
+      // async handleDeleteScore(row) {
+      //   let result = await reqDeleteScore(row)
+      //   if (result.statu === 0){
+      //     this.$message({
+      //       message: '删除成功，该考生可重新进行该试卷的考试',
+      //       type: 'success'
+      //     })
+      //     this.getList()
+      //   } else {
+      //     this.$message({
+      //       message: result.msg,
+      //       type: 'error'
+      //     })
+      //   }
+      // },
       async handleFilter(){
-        this.listQuery.page = 1
-        this.listLoading = true
-        let paperId = this.listQuery.paperId
-        if (this.listQuery.paperId == null || this.listQuery.paperId == undefined){
-          paperId = 0
-        }
-        let result = await reqSearchScoresList(this.listQuery.sno, paperId)
-        if (result.statu === 0){
-          this.total = result.data.length
-          this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
-        }
-        // 延迟一秒等待请求数据
-        setTimeout(() => {
-          this.listLoading = false
-        }, 500)
+        this.getList()
+        // this.listQuery.page = 1
+        // this.listLoading = true
+        // let paperId = this.listQuery.paperId
+        // if (this.listQuery.paperId == null || this.listQuery.paperId == undefined){
+        //   paperId = 0
+        // }
+        // let result = await reqSearchScoresList(this.listQuery.sno, paperId)
+        // if (result.statu === 0){
+        //   this.total = result.data.length
+        //   this.list = result.data.filter((item, index) => index < this.listQuery.limit * this.listQuery.page && index >= this.listQuery.limit * (this.listQuery.page - 1))
+        // }
+        // // 延迟一秒等待请求数据
+        // setTimeout(() => {
+        //   this.listLoading = false
+        // }, 500)
       },
       handleDownload(){
         this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['学号', '姓名', '试卷名称', '考试分数', '开始考试时间', '提交考卷时间', '花费时间']
-          const filterVal = ['sno', 'stuName', 'paperName', 'score', 'startTime', 'endTime', 'timeUsed']
+          const tHeader = ['学号', '姓名', '试卷名称', '试卷总分', '考试分数']
+          const filterVal = ['studentId', 'studentName', 'paperTitle', 'totalScore', 'resultScore']
           const data = this.formatJson(filterVal, this.list)
           excel.export_json_to_excel({
             header: tHeader,
@@ -211,23 +220,23 @@ import BookTypeOption from './components/BookTypeOption'
           this.downloadLoading = false
         })
       },
-      async handleDownloadAll(){
-        this.downloadLoading = true
-        let result = await reqGetScoresList()
-        let list = result.data.scoresList
-        import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['学号', '姓名', '试卷名称', '考试分数', '开始考试时间', '提交考卷时间', '花费时间']
-          const filterVal = ['sno', 'stuName', 'paperName', 'score', 'startTime', 'endTime', 'timeUsed']
-          const data = this.formatJson(filterVal, list)
-          excel.export_json_to_excel({
-            header: tHeader,
-            data,
-            filename: '全部成绩信息表',
-            bookType: this.bookType
-          })
-          this.downloadLoading = false
-        })
-      },
+      // async handleDownloadAll(){
+      //   this.downloadLoading = true
+      //   let result = await reqGetScoresList()
+      //   let list = result.data.scoresList
+      //   import('@/vendor/Export2Excel').then(excel => {
+      //     const tHeader = ['学号', '姓名', '试卷名称', '试卷总分', '考试分数']
+      //     const filterVal = ['studentId', 'studentName', 'paperTitle', 'totalScore', 'resultScore']
+      //     const data = this.formatJson(filterVal, list)
+      //     excel.export_json_to_excel({
+      //       header: tHeader,
+      //       data,
+      //       filename: '全部成绩信息表',
+      //       bookType: this.bookType
+      //     })
+      //     this.downloadLoading = false
+      //   })
+      // },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {
           if (j === 'startTime' || j === 'endTime') {
