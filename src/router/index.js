@@ -117,99 +117,99 @@ export const constantRouterMap = [
   //   ]
   // },
 
-  {
-    path: '/bank',
-    component: Layout,
-    redirect: '/bank/bank-single/single-info',
-    name: 'Bank',
-    meta: { title: '题库管理', icon: 'que-bank' },
-    children: [
-      {
-        path: 'bank-single',
-        component: () => import('@/views/bankManage/bankSingle/index'),
-        name: 'BankSingle',
-        redirect: '/bank/bank-single/single-info',
-        meta: { title: '单选题库管理', icon: 'single-bank' },
-        children: [
-          {
-            path: 'single-info',
-            name: 'SingleInfo',
-            component: () => import('@/views/bankManage/bankSingle/singleInfo'),
-            meta: { title: '单选题信息管理', icon: 'single-info' }
-          },
-          {
-            path: 'single-upload',
-            name: 'SingleUpload',
-            component: () => import('@/views/bankManage/bankSingle/singleUpload'),
-            meta: { title: '上传单选题', icon: 'excel' }
-          }
-        ]
-      },
-      {
-        path: 'bank-multiple',
-        component: () => import('@/views/bankManage/bankMultiple/index'),
-        name: 'BankMultiple',
-        redirect: '/bank/bank-multiple/multiple-info',
-        meta: { title: '多选题库管理', icon: 'multiple-bank' },
-        children: [
-          {
-            path: 'multiple-info',
-            name: 'MultipleInfo',
-            component: () => import('@/views/bankManage/bankMultiple/multipleInfo'),
-            meta: { title: '多选题信息管理', icon: 'multiple-info' }
-          },
-          {
-            path: 'multiple-upload',
-            name: 'MultipleUpload',
-            component: () => import('@/views/bankManage/bankMultiple/multipleUpload'),
-            meta: { title: '上传多选题', icon: 'excel' }
-          }
-        ]
-      },
-      {
-        path: 'bank-judge',
-        component: () => import('@/views/bankManage/bankJudge/index'),
-        name: 'BankJudge',
-        redirect: '/bank/bank-judge/judge-info',
-        meta: { title: '判断题库管理', icon: 'judge-bank' },
-        children: [
-          {
-            path: 'judge-info',
-            name: 'JudgeInfo',
-            component: () => import('@/views/bankManage/bankJudge/judgeInfo'),
-            meta: { title: '判断题信息管理', icon: 'judge-info' }
-          },
-          {
-            path: 'judge-upload',
-            name: 'JudgeUpload',
-            component: () => import('@/views/bankManage/bankJudge/judgeUpload'),
-            meta: { title: '上传判断题', icon: 'excel' }
-          }
-        ]
-      },
-      {
-        path: 'bank-fill',
-        component: () => import('@/views/bankManage/bankFill/index'),
-        name: 'BankFill',
-        redirect: '/bank/bank-fill/fill-info',
-        meta: { title: '填空题库管理', icon: 'fill-bank' },
-        children: [
-          {
-            path: 'fill-info',
-            name: 'FillInfo',
-            component: () => import('@/views/bankManage/bankFill/fillInfo'),
-            meta: { title: '填空题信息管理', icon: 'fill-info' }
-          },
-          {
-            path: 'fill-upload',
-            name: 'FillUpload',
-            component: () => import('@/views/bankManage/bankFill/fillUpload'),
-            meta: { title: '上传填空题', icon: 'excel' }
-          }
-        ]
-      }
-    ]
-  },
+  // {
+  //   path: '/bank',
+  //   component: Layout,
+  //   redirect: '/bank/bank-single/single-info',
+  //   name: 'Bank',
+  //   meta: { title: '题库管理', icon: 'que-bank' },
+  //   children: [
+  //     {
+  //       path: 'bank-single',
+  //       component: () => import('@/views/bankManage/bankSingle/index'),
+  //       name: 'BankSingle',
+  //       redirect: '/bank/bank-single/single-info',
+  //       meta: { title: '单选题库管理', icon: 'single-bank' },
+  //       children: [
+  //         {
+  //           path: 'single-info',
+  //           name: 'SingleInfo',
+  //           component: () => import('@/views/bankManage/bankSingle/singleInfo'),
+  //           meta: { title: '单选题信息管理', icon: 'single-info' }
+  //         },
+  //         {
+  //           path: 'single-upload',
+  //           name: 'SingleUpload',
+  //           component: () => import('@/views/bankManage/bankSingle/singleUpload'),
+  //           meta: { title: '上传单选题', icon: 'excel' }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       path: 'bank-multiple',
+  //       component: () => import('@/views/bankManage/bankMultiple/index'),
+  //       name: 'BankMultiple',
+  //       redirect: '/bank/bank-multiple/multiple-info',
+  //       meta: { title: '多选题库管理', icon: 'multiple-bank' },
+  //       children: [
+  //         {
+  //           path: 'multiple-info',
+  //           name: 'MultipleInfo',
+  //           component: () => import('@/views/bankManage/bankMultiple/multipleInfo'),
+  //           meta: { title: '多选题信息管理', icon: 'multiple-info' }
+  //         },
+  //         {
+  //           path: 'multiple-upload',
+  //           name: 'MultipleUpload',
+  //           component: () => import('@/views/bankManage/bankMultiple/multipleUpload'),
+  //           meta: { title: '上传多选题', icon: 'excel' }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       path: 'bank-judge',
+  //       component: () => import('@/views/bankManage/bankJudge/index'),
+  //       name: 'BankJudge',
+  //       redirect: '/bank/bank-judge/judge-info',
+  //       meta: { title: '判断题库管理', icon: 'judge-bank' },
+  //       children: [
+  //         {
+  //           path: 'judge-info',
+  //           name: 'JudgeInfo',
+  //           component: () => import('@/views/bankManage/bankJudge/judgeInfo'),
+  //           meta: { title: '判断题信息管理', icon: 'judge-info' }
+  //         },
+  //         {
+  //           path: 'judge-upload',
+  //           name: 'JudgeUpload',
+  //           component: () => import('@/views/bankManage/bankJudge/judgeUpload'),
+  //           meta: { title: '上传判断题', icon: 'excel' }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       path: 'bank-fill',
+  //       component: () => import('@/views/bankManage/bankFill/index'),
+  //       name: 'BankFill',
+  //       redirect: '/bank/bank-fill/fill-info',
+  //       meta: { title: '填空题库管理', icon: 'fill-bank' },
+  //       children: [
+  //         {
+  //           path: 'fill-info',
+  //           name: 'FillInfo',
+  //           component: () => import('@/views/bankManage/bankFill/fillInfo'),
+  //           meta: { title: '填空题信息管理', icon: 'fill-info' }
+  //         },
+  //         {
+  //           path: 'fill-upload',
+  //           name: 'FillUpload',
+  //           component: () => import('@/views/bankManage/bankFill/fillUpload'),
+  //           meta: { title: '上传填空题', icon: 'excel' }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
 
   // {
   //   path: 'my-homepage',
@@ -221,18 +221,18 @@ export const constantRouterMap = [
   //     }
   //   ]
   // },
-  {
-    path: '/paperInfo',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'index',
-        component: ()=>import('@/views/paper/PaperInfo'),
-        meta: {title: '试卷管理2' , icon: 'info'},
-      }
-    ]
-  },
+  // {
+  //   path: '/paperInfo',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'index',
+  //       component: ()=>import('@/views/paper/PaperInfo'),
+  //       meta: {title: '试卷管理2' , icon: 'info'},
+  //     }
+  //   ]
+  // },
   {
     path: '/paper',
     component: Layout,
@@ -248,7 +248,7 @@ export const constantRouterMap = [
   {
     path: '/question',
     component: Layout,
-    meta: { title: '题库', icon: 'info' },
+    meta: { title: '题库管理', icon: 'info' },
     children: [
       {
         path: '',
